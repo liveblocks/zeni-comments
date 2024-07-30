@@ -21,13 +21,39 @@ export async function POST(request: NextRequest) {
   // Get the current user's unique id from your database
   const userIndex = Math.floor(Math.random() * NAMES.length);
 
-  // Create a session for the current user (access token auth)
-  const session = liveblocks.prepareSession(`user-${userIndex}`);
+  const username = `user-${userIndex}`;
 
-  // Use a naming pattern to allow access to rooms with a wildcard
-  session.allow(`liveblocks:examples:*`, session.FULL_ACCESS);
+  // Quickly create 10 rooms, 0-9
+  // for (let i = 0; i < 10; i++) {
+  //   await createRoomFromCustomerId(i.toString(), username);
+  // }
 
-  // Authorize the user and return the result
-  const { status, body } = await session.authorize();
+
+  /**
+   * ID token authentication
+   */
+  const { status, body } = await liveblocks.identifyUser(username);
+
+  /**
+   * Access token authentication
+   */
+  // // Create a session for the current user (access token auth)
+  // const session = liveblocks.prepareSession(`user-${userIndex}`);
+
+  // // Use a naming pattern to allow access to rooms with a wildcard
+  // session.allow(`liveblocks:examples:*`, session.FULL_ACCESS);
+
+  // // Authorize the user and return the result
+  // const { status, body } = await session.authorize();
   return new NextResponse(body, { status });
+}
+
+
+const createRoomFromCustomerId = async (customerId: string, username: string) => {
+  await liveblocks.createRoom(`zeni:${customerId}`, {
+    defaultAccesses: [],
+    usersAccesses: {
+      [username]: ["room:write"],
+    },
+  })
 }

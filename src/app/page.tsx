@@ -85,7 +85,7 @@ export default function Page() {
           />
         ))}
       </tbody>
-      <tfoot>
+      {/* <tfoot>
         <tr>
           <td colSpan={4}>
             <button
@@ -96,7 +96,7 @@ export default function Page() {
             </button>
           </td>
         </tr>
-      </tfoot>
+      </tfoot> */}
     </table>
   );
 }
@@ -112,7 +112,7 @@ function CustomerRow({
 }) {
   if (focused) {
     return (
-      <RoomProvider id={`liveblocks:examples:nextjs-comments:${customerId}`}>
+      <RoomProvider id={`zeni:${customerId}`}>
         <LiveblocksRow
           customerId={customerId}
           onClick={onClick}
