@@ -114,9 +114,13 @@ function LiveblocksRow({
   const { threads } = useThreads();
 
   useEffect(() => {
+    // room.connect();
+    
     return () => {
+      // TODO: understand why this is called on focus
       console.log("unmounting", customerId);
-      room.disconnect();
+      // disabling for now
+      // room.disconnect();
     };
   });
 
