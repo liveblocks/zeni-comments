@@ -40,15 +40,13 @@ export default function Page() {
     },
     [token]
   );
-  const { data, error, isLoading } = useSWR(
+  const { data, error, isLoading } = useSWR<{ threads: ThreadData[] }>(
     "https://dev.dev-liveblocks5948.workers.dev/v2/c/threads",
     fetcher,
     {
       refreshInterval: seconds(5),
     }
   );
-
-  console.log(data, error, isLoading);
 
   const [customerIds, setcustomerIds] = useState(() =>
     Array.from({ length: numberOfExamples }, (_, i) => i)
@@ -68,11 +66,14 @@ export default function Page() {
     <table style={{ width: "100%", margin: 50 }}>
       <thead>
         <tr>
-          <th style={{ width: "20%" }}>Name</th>
-          <th style={{ width: "20%" }}>Group</th>
-          <th style={{ width: "20%" }}>Plan</th>
-          <th style={{ width: "20%" }}>Using RoomProvider</th>
-          <th style={{ width: "20%" }}>Thread</th>
+          <th style={{ width: "20%", minWidth: "150px" }}>Name</th>
+          <th style={{ width: "20%", minWidth: "150px" }}>Group</th>
+          <th style={{ width: "20%", minWidth: "150px" }}>Plan</th>
+          <th style={{ minWidth: "150px" }}>has thread</th>
+          <th style={{ width: "20%", minWidth: "150px" }}>
+            Using RoomProvider
+          </th>
+          <th style={{ width: "20%", minWidth: "150px" }}>Thread</th>
         </tr>
       </thead>
       <tbody>
@@ -82,6 +83,11 @@ export default function Page() {
             customerId={customerId.toString()}
             onClick={setFocusedCustomerId}
             focused={focusedCustomerId === customerId.toString()}
+            hasThread={
+              data?.threads.some(
+                (thread) => thread.roomId === `zeni:${customerId.toString()}`
+              ) ?? false
+            }
           />
         ))}
       </tbody>
@@ -105,10 +111,12 @@ function CustomerRow({
   customerId,
   focused,
   onClick,
+  hasThread,
 }: {
   customerId: string;
   focused: boolean;
   onClick: (customerId: string) => void;
+  hasThread: boolean;
 }) {
   if (focused) {
     return (
@@ -117,6 +125,7 @@ function CustomerRow({
           customerId={customerId}
           onClick={onClick}
           focused={focused}
+          hasThread={hasThread}
         />
       </RoomProvider>
     );
@@ -128,6 +137,7 @@ function CustomerRow({
       onClick={onClick}
       focused={focused}
       thread={null}
+      hasThread={hasThread}
     />
   );
 }
@@ -136,10 +146,12 @@ function LiveblocksRow({
   customerId,
   onClick,
   focused,
+  hasThread,
 }: {
   customerId: string;
   onClick: (customerId: string) => void;
   focused: boolean;
+  hasThread: boolean;
 }) {
   const { threads } = useThreads();
 
@@ -167,6 +179,7 @@ function LiveblocksRow({
           onClick={onClick}
           focused={focused}
           thread={threads.length > 0 ? threads[0] : null}
+          hasThread={hasThread}
         />
       </ClientSideSuspense>
     </ErrorBoundary>
@@ -178,11 +191,13 @@ function Row({
   onClick,
   focused,
   thread,
+  hasThread,
 }: {
   customerId: string;
   onClick: (customerId: string) => void;
   focused: boolean;
   thread: null | ThreadData;
+  hasThread: boolean;
 }) {
   return (
     <tr key={customerId} onClick={() => onClick(customerId)}>
@@ -197,6 +212,7 @@ function Row({
           ? plans[parseInt(customerId) % plans.length]
           : "-"}
       </td>
+      <td>{hasThread.toString()}</td>
       <td>{focused.toString()}</td>
       <td>
         {thread ? <Thread thread={thread} /> : focused ? <Composer /> : "-"}
