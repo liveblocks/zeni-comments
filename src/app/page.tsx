@@ -109,20 +109,20 @@ function LiveblocksRow({
   onClick: (customerId: string) => void;
   focused: boolean;
 }) {
-  const room = useRoom();
-
+  
   const { threads } = useThreads();
+  
+  // disabling for now
+  // const room = useRoom();
+  // useEffect(() => {
+  //   room.connect();
 
-  useEffect(() => {
-    // room.connect();
-    
-    return () => {
-      // TODO: understand why this is called on focus
-      console.log("unmounting", customerId);
-      // disabling for now
-      // room.disconnect();
-    };
-  });
+  //   return () => {
+  //     // TODO: understand why this is called on focus
+  //     console.log("unmounting", customerId);
+  //     room.disconnect();
+  //   };
+  // });
 
   return (
     <ErrorBoundary
@@ -139,7 +139,7 @@ function LiveblocksRow({
         />
       </ClientSideSuspense>
     </ErrorBoundary>
-  ); 
+  );
 }
 
 function Row({
