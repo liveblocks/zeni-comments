@@ -7,7 +7,7 @@ import { ClientSideSuspense, useRoom } from "@liveblocks/react";
 import { ErrorBoundary } from "react-error-boundary";
 import { ThreadData } from "@liveblocks/core";
 import useSWR from "swr";
-import { Thread } from "@liveblocks/react-ui";
+import { Composer, Thread } from "@liveblocks/react-ui";
 import { useAuth } from "./Providers";
 
 const groups = ["Pro", "Growth", "Enterprise"];
@@ -15,8 +15,6 @@ const groups = ["Pro", "Growth", "Enterprise"];
 const plans = ["tax pro", "payroll", "accounting"];
 
 const seconds = (n: number) => n * 1000;
-
-const devURL = "https://dev.dev-liveblocks5948.workers.dev";
 
 export default function Page() {
   const [numberOfExamples, setNumberOfExamples] = useState(10);
@@ -42,9 +40,13 @@ export default function Page() {
     },
     [token]
   );
-  const { data, error, isLoading } = useSWR(`${devURL}/v2/c/threads`, fetcher, {
-    refreshInterval: seconds(5),
-  });
+  const { data, error, isLoading } = useSWR(
+    "https://dev.dev-liveblocks5948.workers.dev/v2/c/threads",
+    fetcher,
+    {
+      refreshInterval: seconds(5),
+    }
+  );
 
   console.log(data, error, isLoading);
 
@@ -196,7 +198,9 @@ function Row({
           : "-"}
       </td>
       <td>{focused.toString()}</td>
-      <td>{thread ? <Thread thread={thread} /> : "-"}</td>
+      <td>
+        {thread ? <Thread thread={thread} /> : focused ? <Composer /> : "-"}
+      </td>
     </tr>
   );
 }

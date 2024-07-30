@@ -31,6 +31,8 @@ export const Providers = ({ children }: { children: ReactNode }) => {
   return (
     <AuthContext.Provider value={{ token, setToken }}>
       <LiveblocksProvider
+        // @ts-expect-error
+        baseUrl="https://dev.dev-liveblocks5948.workers.dev"
         authEndpoint={async (room) => {
           const response = await fetch("/api/liveblocks-auth", {
             method: "POST",
