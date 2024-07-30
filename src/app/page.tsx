@@ -1,22 +1,52 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { RoomProvider, useThreads } from "@liveblocks/react/suspense";
 import { Loading } from "../components/Loading";
 import { ClientSideSuspense, useRoom } from "@liveblocks/react";
 import { ErrorBoundary } from "react-error-boundary";
 import { ThreadData } from "@liveblocks/core";
+import useSWR from "swr";
 import { Thread } from "@liveblocks/react-ui";
+import { useAuth } from "./Providers";
 
 const groups = ["Pro", "Growth", "Enterprise"];
 
 const plans = ["tax pro", "payroll", "accounting"];
+
+const seconds = (n: number) => n * 1000;
+
+const devURL = "https://dev.dev-liveblocks5948.workers.dev";
 
 export default function Page() {
   const [numberOfExamples, setNumberOfExamples] = useState(10);
   const [focusedCustomerId, setFocusedCustomerId] = useState<string | null>(
     null
   );
+  const { token } = useAuth();
+
+  const fetcher = useCallback(
+    async (url: string) => {
+      if (!token) {
+        console.log("No token");
+        return;
+      }
+
+      const res = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      return res.json();
+    },
+    [token]
+  );
+  const { data, error, isLoading } = useSWR(`${devURL}/v2/c/threads`, fetcher, {
+    refreshInterval: seconds(5),
+  });
+
+  console.log(data, error, isLoading);
 
   const [customerIds, setcustomerIds] = useState(() =>
     Array.from({ length: numberOfExamples }, (_, i) => i)
@@ -109,9 +139,8 @@ function LiveblocksRow({
   onClick: (customerId: string) => void;
   focused: boolean;
 }) {
-  
   const { threads } = useThreads();
-  
+
   // disabling for now
   // const room = useRoom();
   // useEffect(() => {

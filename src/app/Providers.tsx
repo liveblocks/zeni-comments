@@ -13,7 +13,7 @@ import {
 export const AuthContext = createContext<{
   token: null;
   setToken: Dispatch<SetStateAction<null>>;
-} | null>(null);
+}>({ token: null, setToken: () => {} });
 import { ReactNode } from "react";
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
@@ -37,8 +37,6 @@ export const Providers = ({ children }: { children: ReactNode }) => {
             headers: {
               "Content-Type": "application/json",
             },
-            // Don't forget to pass `room` down. Note that it
-            // can be undefined when using Notifications.
             body: JSON.stringify({ room }),
           });
 
