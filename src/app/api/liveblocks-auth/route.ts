@@ -18,10 +18,7 @@ export async function POST(request: NextRequest) {
     return new NextResponse("Missing LIVEBLOCKS_SECRET_KEY", { status: 403 });
   }
 
-  // Get the current user's unique id from your database
-  const userIndex = Math.floor(Math.random() * NAMES.length);
-
-  const username = `user-${userIndex}`;
+  const username = `user-1`;
 
   // Quickly create 10 rooms, 0-9
   // for (let i = 0; i < 10; i++) {
