@@ -3,17 +3,15 @@
 import { LiveblocksProvider } from "@liveblocks/react";
 import React, { PropsWithChildren } from "react";
 import { LIVEBLOCKS_BASE_URL } from "../constants";
-import { useAuthEndpointCallback } from "../authentication";
 
 export function Providers({ children }: PropsWithChildren) {
-  const authEndpoint = useAuthEndpointCallback("/api/liveblocks-auth");
 
   return (
     <LiveblocksProvider
       // @ts-expect-error
       baseUrl={LIVEBLOCKS_BASE_URL}
       // Get the auth token from the auth endpoint
-      authEndpoint={authEndpoint}
+      authEndpoint={"/api/liveblocks-auth"}
       // Get users' info from their ID
       resolveUsers={async ({ userIds }) => {
         const searchParams = new URLSearchParams(

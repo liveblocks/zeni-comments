@@ -1,7 +1,4 @@
-import { useCallback } from "react";
-import { useLiveblocksAuth } from "./authentication";
 import { ThreadData } from "@liveblocks/client";
-import { LIVEBLOCKS_BASE_URL } from "./constants";
 import useSWR from "swr";
 
 type ThreadsStateLoading = {
@@ -28,34 +25,20 @@ type ThreadsState =
   | ThreadsStateSuccess;
 
 const seconds = (seconds: number) => seconds * 1000;
+const minutes = (minutes: number) => seconds(minutes * 60);
 
 export function useAllThreads(): ThreadsState {
-  const { token } = useLiveblocksAuth();
+  const fetcher = async (url: string) => {
+    const res = await fetch(url);
 
-  const fetcher = useCallback(
-    async (url: string) => {
-      if (!token) {
-        console.log("Missing Liveblocks token.");
-        return;
-      }
-
-      const res = await fetch(url, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      return res.json();
-    },
-    [token]
-  );
+    return res.json();
+  };
 
   const { data, isLoading, error } = useSWR<{ threads: ThreadData[] }, Error>(
-    // Only start fetching threads if we have a token
-    token ? `${LIVEBLOCKS_BASE_URL}/v2/c/threads` : null,
+    "/api/liveblocks-user-threads",
     fetcher,
     {
-      refreshInterval: seconds(5),
+      refreshInterval: minutes(2),
     }
   );
 
