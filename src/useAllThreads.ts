@@ -38,7 +38,7 @@ export function useAllThreads(): ThreadsState {
     "/api/liveblocks-user-threads",
     fetcher,
     {
-      refreshInterval: minutes(2),
+      refreshInterval: seconds(5),
     }
   );
 
