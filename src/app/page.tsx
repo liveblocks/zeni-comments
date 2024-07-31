@@ -18,6 +18,7 @@ import { Composer, Thread } from "@liveblocks/react-ui";
 import * as Dialog from "@radix-ui/react-dialog";
 import { useAllThreads } from "../useAllThreads";
 import { Loading } from "../components/Loading";
+import { CollapsedThread } from "../components/CollapsedThread";
 
 interface RowProps extends ComponentProps<"li"> {
   customerId: string;
@@ -91,17 +92,11 @@ export default function Page() {
                 <Loading />
               ) : (
                 threads?.map((thread) => (
-                  <RoomProvider
-                    id={thread.roomId}
-                    key={thread.roomId}
-                    autoConnect={false}
-                  >
-                    <Thread
-                      key={thread.id}
-                      thread={thread}
-                      className="sidebar-thread"
-                    />
-                  </RoomProvider>
+                  <CollapsedThread
+                    key={thread.id}
+                    thread={thread}
+                    className="sidebar-thread"
+                  />
                 ))
               )}
             </div>

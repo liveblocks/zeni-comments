@@ -302,3 +302,13 @@ body {
     0 8px 26px rgb(0 0 0 / 6%);
   overflow: hidden;
 }
+
+.collapsed-thread-actions {
+  display: flex;
+  padding: 1rem;
+  padding-top: 0;
+}
+
+.collapsed-thread-actions .button {
+  flex: 1 0 auto;
+}
