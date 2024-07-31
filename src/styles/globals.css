@@ -60,6 +60,7 @@ body {
 
 .lb-portal {
   z-index: 100;
+  pointer-events: all;
 }
 
 .header {
