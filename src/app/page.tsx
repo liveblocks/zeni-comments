@@ -3,7 +3,6 @@
 import {
   ComponentProps,
   MouseEvent,
-  PropsWithChildren,
   ReactNode,
   useCallback,
   useMemo,
@@ -33,6 +32,7 @@ interface SidebarProps
   extends Omit<Dialog.DialogTriggerProps, "content" | "title"> {
   content?: ReactNode;
   title: ReactNode;
+  description: ReactNode;
 }
 
 export default function Page() {
@@ -84,6 +84,7 @@ export default function Page() {
         </button>
         <Sidebar
           title="Comments"
+          description="All threads for current user"
           content={
             <div className="sidebar-threads">
               {threads?.map((thread) => (
@@ -211,7 +212,13 @@ function Row({
   );
 }
 
-function Sidebar({ children, title, content, ...props }: SidebarProps) {
+function Sidebar({
+  children,
+  title,
+  description,
+  content,
+  ...props
+}: SidebarProps) {
   return (
     <Dialog.Root>
       <Dialog.Trigger asChild {...props}>
@@ -221,6 +228,9 @@ function Sidebar({ children, title, content, ...props }: SidebarProps) {
         <Dialog.Overlay className="sidebar-overlay" />
         <Dialog.Content className="sidebar-content">
           <Dialog.Title className="sidebar-title">{title}</Dialog.Title>
+          <Dialog.Description className="sidebar-description">
+            {description}
+          </Dialog.Description>
           {content}
         </Dialog.Content>
       </Dialog.Portal>

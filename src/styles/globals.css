@@ -153,6 +153,7 @@ body {
 .row {
   display: flex;
   position: relative;
+  overflow: hidden;
   background: #fff;
   border-radius: 0.5rem;
   cursor: pointer;
