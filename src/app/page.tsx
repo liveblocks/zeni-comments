@@ -91,18 +91,21 @@ export default function Page() {
           />
         ))}
       </tbody>
-      {/* <tfoot>
+      <tfoot>
         <tr>
           <td colSpan={4}>
             <button
-              className="load-more"
-              onClick={() => setNumberOfExamples(numberOfExamples + 10)}
+              onClick={async () => {
+                await fetch("/api/liveblocks-rooms", {
+                  method: "POST",
+                });
+              }}
             >
-              Load more
+              Create rooms
             </button>
           </td>
         </tr>
-      </tfoot> */}
+      </tfoot>
     </table>
   );
 }
