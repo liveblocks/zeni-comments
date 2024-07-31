@@ -8,6 +8,26 @@
   }
 }
 
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeSlideRight {
+  from {
+    opacity: 0;
+    transform: translate(10%, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+}
+
 html,
 body {
   --accent: #44f;
@@ -212,4 +232,37 @@ body {
 
 .row-comments-composer {
   border-top: 1px solid rgb(0 0 0 / 10%);
+}
+
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgb(0 0 0 / 30%);
+  animation: fade 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sidebar-content {
+  background: white;
+  box-shadow:
+    0 0 0 1px rgb(0 0 0 / 4%),
+    0 2px 6px rgb(0 0 0 / 4%),
+    0 8px 26px rgb(0 0 0 / 6%);
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  width: 520px;
+  animation: fadeSlideRight 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sidebar-content:focus {
+  outline: none;
+}
+
+.sidebar-title {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 500;
 }

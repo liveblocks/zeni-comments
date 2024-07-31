@@ -3,6 +3,8 @@
 import {
   ComponentProps,
   MouseEvent,
+  PropsWithChildren,
+  ReactNode,
   useCallback,
   useMemo,
   useState,
@@ -14,6 +16,7 @@ import {
 } from "@liveblocks/react";
 import { ThreadData } from "@liveblocks/core";
 import { Composer, Thread } from "@liveblocks/react-ui";
+import * as Dialog from "@radix-ui/react-dialog";
 import { useAllThreads } from "../useAllThreads";
 import { Loading } from "../components/Loading";
 
@@ -24,6 +27,12 @@ interface RowProps extends ComponentProps<"li"> {
   hasThread: boolean;
   thread?: ThreadData;
   isLoading?: boolean;
+}
+
+interface SidebarProps
+  extends Omit<Dialog.DialogTriggerProps, "content" | "title"> {
+  content?: ReactNode;
+  title: ReactNode;
 }
 
 export default function Page() {
@@ -73,6 +82,30 @@ export default function Page() {
         <button className="button" onClick={createAllRooms}>
           Create all rooms
         </button>
+        <Sidebar
+          title="Comments"
+          content={
+            <div className="sidebar-threads">
+              {threads?.map((thread) => (
+                <Thread key={thread.id} thread={thread} />
+              ))}
+            </div>
+          }
+        >
+          <button className="button square" aria-label="View all comments">
+            <svg
+              width="20"
+              height="20"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="m6.615 16.128.484-.874a1 1 0 0 0-.8-.074l.316.948ZM2.5 17.5l-.949-.316a1 1 0 0 0 1.265 1.265L2.5 17.5Zm1.372-4.115.948.316a1 1 0 0 0-.074-.8l-.874.484ZM10 18a8 8 0 0 0 8-8h-2a6 6 0 0 1-6 6v2Zm-3.87-.997A7.968 7.968 0 0 0 10 18v-2a5.968 5.968 0 0 1-2.901-.746l-.969 1.75ZM2.816 18.45l4.115-1.372-.633-1.897-4.114 1.371.632 1.898Zm.107-5.38L1.55 17.184l1.898.632 1.371-4.114-1.897-.633ZM2 10c0 1.402.361 2.722.997 3.87l1.75-.969A5.968 5.968 0 0 1 4 10H2Zm8-8a8 8 0 0 0-8 8h2a6 6 0 0 1 6-6V2Zm8 8a8 8 0 0 0-8-8v2a6 6 0 0 1 6 6h2Z"
+                fill="currentColor"
+              />
+            </svg>
+          </button>
+        </Sidebar>
       </header>
     </>
   );
@@ -175,5 +208,22 @@ function Row({
         </div>
       )}
     </li>
+  );
+}
+
+function Sidebar({ children, title, content, ...props }: SidebarProps) {
+  return (
+    <Dialog.Root>
+      <Dialog.Trigger asChild {...props}>
+        {children}
+      </Dialog.Trigger>
+      <Dialog.Portal>
+        <Dialog.Overlay className="sidebar-overlay" />
+        <Dialog.Content className="sidebar-content">
+          <Dialog.Title className="sidebar-title">{title}</Dialog.Title>
+          {content}
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
   );
 }
