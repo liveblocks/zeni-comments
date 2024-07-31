@@ -1,168 +1,179 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { RoomProvider, useThreads } from "@liveblocks/react/suspense";
-import { Loading } from "../components/Loading";
-import { ClientSideSuspense } from "@liveblocks/react";
-import { ErrorBoundary } from "react-error-boundary";
+import {
+  ComponentProps,
+  MouseEvent,
+  useCallback,
+  useMemo,
+  useState,
+} from "react";
+import {
+  ClientSideSuspense,
+  RoomProvider,
+  useThreads,
+} from "@liveblocks/react";
 import { ThreadData } from "@liveblocks/core";
 import { Composer, Thread } from "@liveblocks/react-ui";
 import { useAllThreads } from "../useAllThreads";
+import { Loading } from "../components/Loading";
+
+interface RowProps extends ComponentProps<"li"> {
+  customerId: string;
+  onRowFocusChange: (customerId: string) => void;
+  isFocused: boolean;
+  hasThread: boolean;
+  thread?: ThreadData;
+  isLoading?: boolean;
+}
 
 export default function Page() {
   const [numberOfExamples, setNumberOfExamples] = useState(500);
-  const [customerIds, setCustomerIds] = useState(() =>
-    Array.from({ length: numberOfExamples }, (_, i) => i)
-  );
+  const customerIds = useMemo(() => {
+    return Array.from({ length: numberOfExamples }, (_, index) => `${index}`);
+  }, [numberOfExamples]);
   const [focusedCustomerId, setFocusedCustomerId] = useState<string | null>(
     null
   );
   const { threads } = useAllThreads();
 
-  useEffect(() => {
-    setCustomerIds((customerIds) => [
-      ...customerIds,
-      ...Array.from(
-        { length: numberOfExamples - customerIds.length },
-        (_, i) => customerIds.length + i
-      ),
-    ]);
-  }, [numberOfExamples]);
+  const createAllRooms = useCallback(async () => {
+    await fetch("/api/liveblocks-rooms", {
+      method: "POST",
+    });
+  }, []);
+
+  // const handleRowFocusChange = useCallback((customerId: string) => {
+  //   setFocusedCustomerId((focusedCustomerId) =>
+  //     focusedCustomerId === customerId ? null : customerId
+  //   );
+  // }, []);
 
   return (
-    <table style={{ width: "100%", margin: 50 }}>
-      <thead>
-        <tr>
-          <th style={{ width: "20%", minWidth: "150px" }}>Name</th>
-          <th style={{ minWidth: "150px" }}>has thread</th>
-          <th style={{ width: "20%", minWidth: "150px" }}>
-            Using RoomProvider
-          </th>
-          <th style={{ width: "20%", minWidth: "150px" }}>Thread</th>
-        </tr>
-      </thead>
-      <tbody>
-        {customerIds.map((customerId) => (
-          <CustomerRow
-            key={customerId}
-            customerId={customerId.toString()}
-            onClick={setFocusedCustomerId}
-            focused={focusedCustomerId === customerId.toString()}
-            hasThread={
-              threads?.some(
-                (thread) => thread.roomId === `zeni:${customerId.toString()}`
-              ) ?? false
-            }
-          />
-        ))}
-      </tbody>
-      <tfoot>
-        <tr>
-          <td colSpan={4}>
-            <button
-              onClick={async () => {
-                await fetch("/api/liveblocks-rooms", {
-                  method: "POST",
-                });
-              }}
-            >
-              Create rooms
-            </button>
-          </td>
-        </tr>
-      </tfoot>
-    </table>
+    <>
+      <main className="content">
+        <ClientSideSuspense fallback={<Loading />}>
+          <ul className="rows">
+            {customerIds.map((customerId) => (
+              <CustomerRow
+                key={customerId}
+                customerId={customerId}
+                onRowFocusChange={setFocusedCustomerId}
+                isFocused={focusedCustomerId === customerId}
+                hasThread={
+                  threads?.some(
+                    (thread) => thread.roomId === `zeni:${customerId}`
+                  ) ?? false
+                }
+              />
+            ))}
+          </ul>
+        </ClientSideSuspense>
+      </main>
+      <header className="header">
+        <button className="button" onClick={createAllRooms}>
+          Create all rooms
+        </button>
+      </header>
+    </>
   );
 }
 
-function CustomerRow({
-  customerId,
-  focused,
-  onClick,
-  hasThread,
-}: {
-  customerId: string;
-  focused: boolean;
-  onClick: (customerId: string) => void;
-  hasThread: boolean;
-}) {
-  if (focused) {
+function CustomerRow({ isFocused, customerId, ...props }: RowProps) {
+  if (isFocused) {
     return (
       <RoomProvider id={`zeni:${customerId}`}>
         <LiveblocksRow
           customerId={customerId}
-          onClick={onClick}
-          focused={focused}
-          hasThread={hasThread}
+          isFocused={isFocused}
+          {...props}
         />
       </RoomProvider>
     );
   }
 
-  return (
-    <Row
-      customerId={customerId}
-      onClick={onClick}
-      focused={focused}
-      thread={null}
-      hasThread={hasThread}
-    />
-  );
+  return <Row customerId={customerId} isFocused={isFocused} {...props} />;
 }
 
-function LiveblocksRow({
-  customerId,
-  onClick,
-  focused,
-  hasThread,
-}: {
-  customerId: string;
-  onClick: (customerId: string) => void;
-  focused: boolean;
-  hasThread: boolean;
-}) {
-  const { threads } = useThreads();
+function LiveblocksRow(props: RowProps) {
+  const { threads, isLoading } = useThreads();
 
   return (
-    <ErrorBoundary
-      fallback={
-        <div className="error">There was an error while getting threads.</div>
-      }
-    >
-      <ClientSideSuspense fallback={<Loading />}>
-        <Row
-          customerId={customerId}
-          onClick={onClick}
-          focused={focused}
-          thread={threads.length > 0 ? threads[0] : null}
-          hasThread={hasThread}
-        />
-      </ClientSideSuspense>
-    </ErrorBoundary>
+    <Row
+      {...props}
+      thread={threads && threads.length > 0 ? threads[0] : undefined}
+      isLoading={isLoading}
+    />
   );
 }
 
 function Row({
   customerId,
-  onClick,
-  focused,
+  onRowFocusChange,
+  isFocused,
+  isLoading,
   thread,
   hasThread,
-}: {
-  customerId: string;
-  onClick: (customerId: string) => void;
-  focused: boolean;
-  thread: null | ThreadData;
-  hasThread: boolean;
-}) {
+  onClick,
+  ...props
+}: RowProps) {
+  const handleClick = useCallback(
+    (event: MouseEvent<HTMLLIElement>) => {
+      onClick?.(event);
+
+      if (event.isDefaultPrevented()) {
+        return;
+      }
+
+      event.stopPropagation();
+
+      onRowFocusChange(customerId);
+    },
+    [onRowFocusChange, customerId]
+  );
+
   return (
-    <tr key={customerId} onClick={() => onClick(customerId)}>
-      <td>{"zeni:" + customerId}</td>
-      <td>{hasThread ? "✅" : "🛑"}</td>
-      <td>{focused ? "✅" : "🛑"}</td>
-      <td>
-        {thread ? <Thread thread={thread} /> : focused ? <Composer /> : "-"}
-      </td>
-    </tr>
+    <li
+      onClick={handleClick}
+      className="row"
+      data-focused={isFocused ? "" : undefined}
+      {...props}
+    >
+      <div className="row-info">
+        <span className="row-info-primary">
+          <span>zeni:{customerId}</span>
+          {hasThread && <div className="row-dot" />}
+        </span>
+        <small className="row-info-secondary">
+          {isFocused ? (
+            <>
+              Connected to Liveblocks via <code>RoomProvider</code>
+            </>
+          ) : (
+            <>Not connected to Liveblocks</>
+          )}
+        </small>
+      </div>
+      {(thread || isFocused) && (
+        <div className="row-comments">
+          {thread ? (
+            <Thread
+              thread={thread}
+              className="row-comments-thread"
+              showComposer
+            />
+          ) : isLoading && hasThread ? (
+            <Loading />
+          ) : (
+            <>
+              <div className="empty">No thread yet.</div>
+              <Composer
+                className="row-comments-composer"
+                overrides={{ COMPOSER_PLACEHOLDER: "Create thread…" }}
+              />
+            </>
+          )}
+        </div>
+      )}
+    </li>
   );
 }
