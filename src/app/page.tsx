@@ -36,7 +36,7 @@ export default function Page() {
     },
     [token]
   );
-  const { data, error, isLoading } = useSWR<{ threads: ThreadData[] }>(
+  const { data } = useSWR<{ threads: ThreadData[] }>(
     "https://dev.dev-liveblocks5948.workers.dev/v2/c/threads",
     fetcher,
     {
