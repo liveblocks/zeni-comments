@@ -1,5 +1,4 @@
 import { PropsWithChildren } from "react";
-import { LiveblocksAuthProvider } from "../authentication";
 import { Providers } from "./Providers";
 import "../styles/globals.css";
 
@@ -24,9 +23,7 @@ export default function RootLayout({ children }: PropsWithChildren) {
         />
       </head>
       <body>
-        <LiveblocksAuthProvider>
           <Providers>{children}</Providers>
-        </LiveblocksAuthProvider>
       </body>
     </html>
   );
