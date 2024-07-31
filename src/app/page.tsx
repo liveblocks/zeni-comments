@@ -10,14 +10,10 @@ import useSWR from "swr";
 import { Composer, Thread } from "@liveblocks/react-ui";
 import { useAuth } from "./Providers";
 
-const groups = ["Pro", "Growth", "Enterprise"];
-
-const plans = ["tax pro", "payroll", "accounting"];
-
 const seconds = (n: number) => n * 1000;
 
 export default function Page() {
-  const [numberOfExamples, setNumberOfExamples] = useState(10);
+  const [numberOfExamples, setNumberOfExamples] = useState(500);
   const [focusedCustomerId, setFocusedCustomerId] = useState<string | null>(
     null
   );
@@ -63,12 +59,10 @@ export default function Page() {
   }, [numberOfExamples]);
 
   return (
-    <table style={{ width: "100%", margin: 50 }}>
+    <table style={{ width: "100%", margin: 50, color: "white" }}>
       <thead>
         <tr>
           <th style={{ width: "20%", minWidth: "150px" }}>Name</th>
-          <th style={{ width: "20%", minWidth: "150px" }}>Group</th>
-          <th style={{ width: "20%", minWidth: "150px" }}>Plan</th>
           <th style={{ minWidth: "150px" }}>has thread</th>
           <th style={{ width: "20%", minWidth: "150px" }}>
             Using RoomProvider
@@ -204,19 +198,9 @@ function Row({
 }) {
   return (
     <tr key={customerId} onClick={() => onClick(customerId)}>
-      <td>{"Customer " + customerId}</td>
-      <td>
-        {/* Random group using customerId value */}
-        {groups[parseInt(customerId) % groups.length]}
-      </td>
-      <td>
-        {/* Random plan or none "-" using customerId value */}
-        {parseInt(customerId) % 2 === 0
-          ? plans[parseInt(customerId) % plans.length]
-          : "-"}
-      </td>
-      <td>{hasThread.toString()}</td>
-      <td>{focused.toString()}</td>
+      <td>{"zeni:" + customerId}</td>
+      <td>{hasThread ? "✅" : "🛑"}</td>
+      <td>{focused ? "✅" : "🛑"}</td>
       <td>
         {thread ? <Thread thread={thread} /> : focused ? <Composer /> : "-"}
       </td>
