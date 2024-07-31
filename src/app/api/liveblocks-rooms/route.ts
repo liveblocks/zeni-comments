@@ -1,10 +1,11 @@
 import { Liveblocks } from "@liveblocks/node";
 import { NextRequest, NextResponse } from "next/server";
+import { LIVEBLOCKS_BASE_URL } from "../../../constants";
 
 const liveblocks = new Liveblocks({
   secret: process.env.LIVEBLOCKS_SECRET_KEY!,
   // @ts-expect-error
-  baseUrl: "https://dev.dev-liveblocks5948.workers.dev/",
+  baseUrl: LIVEBLOCKS_BASE_URL,
 });
 
 export async function POST(request: NextRequest) {
@@ -33,6 +34,7 @@ const createRoomFromCustomerId = async (
         [username]: ["room:write"],
       },
     });
+
     console.log(res);
   } catch (error) {
     console.error(error);

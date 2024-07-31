@@ -1,55 +1,26 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { RoomProvider, useThreads } from "@liveblocks/react/suspense";
 import { Loading } from "../components/Loading";
-import { ClientSideSuspense, useRoom } from "@liveblocks/react";
+import { ClientSideSuspense } from "@liveblocks/react";
 import { ErrorBoundary } from "react-error-boundary";
 import { ThreadData } from "@liveblocks/core";
-import useSWR from "swr";
 import { Composer, Thread } from "@liveblocks/react-ui";
-import { useAuth } from "./Providers";
-
-const seconds = (n: number) => n * 1000;
+import { useAllThreads } from "../useAllThreads";
 
 export default function Page() {
   const [numberOfExamples, setNumberOfExamples] = useState(500);
+  const [customerIds, setCustomerIds] = useState(() =>
+    Array.from({ length: numberOfExamples }, (_, i) => i)
+  );
   const [focusedCustomerId, setFocusedCustomerId] = useState<string | null>(
     null
   );
-  const { token } = useAuth();
-
-  const fetcher = useCallback(
-    async (url: string) => {
-      if (!token) {
-        console.log("No token");
-        return;
-      }
-
-      const res = await fetch(url, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      return res.json();
-    },
-    [token]
-  );
-  const { data } = useSWR<{ threads: ThreadData[] }>(
-    "https://dev.dev-liveblocks5948.workers.dev/v2/c/threads",
-    fetcher,
-    {
-      refreshInterval: seconds(5),
-    }
-  );
-
-  const [customerIds, setcustomerIds] = useState(() =>
-    Array.from({ length: numberOfExamples }, (_, i) => i)
-  );
+  const { threads } = useAllThreads();
 
   useEffect(() => {
-    setcustomerIds((customerIds) => [
+    setCustomerIds((customerIds) => [
       ...customerIds,
       ...Array.from(
         { length: numberOfExamples - customerIds.length },
@@ -59,7 +30,7 @@ export default function Page() {
   }, [numberOfExamples]);
 
   return (
-    <table style={{ width: "100%", margin: 50, color: "white" }}>
+    <table style={{ width: "100%", margin: 50 }}>
       <thead>
         <tr>
           <th style={{ width: "20%", minWidth: "150px" }}>Name</th>
@@ -78,7 +49,7 @@ export default function Page() {
             onClick={setFocusedCustomerId}
             focused={focusedCustomerId === customerId.toString()}
             hasThread={
-              data?.threads.some(
+              threads?.some(
                 (thread) => thread.roomId === `zeni:${customerId.toString()}`
               ) ?? false
             }
