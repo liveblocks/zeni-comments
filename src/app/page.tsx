@@ -43,7 +43,7 @@ export default function Page() {
   const [focusedCustomerId, setFocusedCustomerId] = useState<string | null>(
     null
   );
-  const { threads } = useAllThreads();
+  const { threads, isLoading: isLoadingAllThreads } = useAllThreads();
 
   const createAllRooms = useCallback(async () => {
     await fetch("/api/liveblocks-rooms", {
@@ -87,9 +87,23 @@ export default function Page() {
           description="All threads for current user"
           content={
             <div className="sidebar-threads">
-              {threads?.map((thread) => (
-                <Thread key={thread.id} thread={thread} />
-              ))}
+              {isLoadingAllThreads ? (
+                <Loading />
+              ) : (
+                threads?.map((thread) => (
+                  <RoomProvider
+                    id={thread.roomId}
+                    key={thread.roomId}
+                    autoConnect={false}
+                  >
+                    <Thread
+                      key={thread.id}
+                      thread={thread}
+                      className="sidebar-thread"
+                    />
+                  </RoomProvider>
+                ))
+              )}
             </div>
           }
         >
@@ -227,7 +241,25 @@ function Sidebar({
       <Dialog.Portal>
         <Dialog.Overlay className="sidebar-overlay" />
         <Dialog.Content className="sidebar-content">
-          <Dialog.Title className="sidebar-title">{title}</Dialog.Title>
+          <header className="sidebar-header">
+            <Dialog.Title className="sidebar-title">{title}</Dialog.Title>
+            <Dialog.Close className="button square" aria-label="Close">
+              <svg
+                width="20"
+                height="20"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M15 5 5 15M5 5l10 10"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </Dialog.Close>
+          </header>
           <Dialog.Description className="sidebar-description">
             {description}
           </Dialog.Description>
