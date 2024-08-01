@@ -71,7 +71,7 @@ body {
   height: var(--header-height);
   display: flex;
   place-items: center;
-  justify-content: space-between;
+  justify-content: right;
   padding: 0 1rem;
   background: #fff;
   box-shadow:

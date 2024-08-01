@@ -5,7 +5,6 @@ import {
   MouseEvent,
   ReactNode,
   useCallback,
-  useMemo,
   useState,
 } from "react";
 import {
@@ -16,7 +15,7 @@ import {
 import { ThreadData } from "@liveblocks/core";
 import { Composer, Thread } from "@liveblocks/react-ui";
 import * as Dialog from "@radix-ui/react-dialog";
-import { useAllThreads } from "../useAllThreads";
+import { experimental_useUserThreads } from "@liveblocks/react";
 import { Loading } from "../components/Loading";
 import { CollapsedThread } from "../components/CollapsedThread";
 
@@ -36,27 +35,14 @@ interface SidebarProps
   description: ReactNode;
 }
 
+const customerIds = Array.from({ length: 500 }, (_, index) => `${index}`);
+
 export default function Page() {
-  const [numberOfExamples, setNumberOfExamples] = useState(500);
-  const customerIds = useMemo(() => {
-    return Array.from({ length: numberOfExamples }, (_, index) => `${index}`);
-  }, [numberOfExamples]);
   const [focusedCustomerId, setFocusedCustomerId] = useState<string | null>(
     null
   );
-  const { threads, isLoading: isLoadingAllThreads } = useAllThreads();
-
-  const createAllRooms = useCallback(async () => {
-    await fetch("/api/liveblocks-rooms", {
-      method: "POST",
-    });
-  }, []);
-
-  // const handleRowFocusChange = useCallback((customerId: string) => {
-  //   setFocusedCustomerId((focusedCustomerId) =>
-  //     focusedCustomerId === customerId ? null : customerId
-  //   );
-  // }, []);
+  const { threads, isLoading: isLoadingAllThreads } =
+    experimental_useUserThreads();
 
   return (
     <>
@@ -80,9 +66,6 @@ export default function Page() {
         </ClientSideSuspense>
       </main>
       <header className="header">
-        <button className="button" onClick={createAllRooms}>
-          Create all rooms
-        </button>
         <Sidebar
           title="Comments"
           description="All threads for current user"

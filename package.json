@@ -9,19 +9,17 @@
     "start": "next start"
   },
   "dependencies": {
-    "@liveblocks/client": "^2.4.1-test1",
-    "@liveblocks/node": "^2.4.1-test1",
-    "@liveblocks/react": "^2.4.1-test1",
-    "@liveblocks/react-ui": "^2.4.1-test1",
+    "@liveblocks/client": "^2.4.1-test3",
+    "@liveblocks/node": "^2.4.1-test3",
+    "@liveblocks/react": "^2.4.1-test3",
+    "@liveblocks/react-ui": "^2.4.1-test3",
     "@radix-ui/react-dialog": "^1.1.1",
     "@radix-ui/react-popover": "^1.1.1",
     "clsx": "^2.1.1",
     "next": "^14.2.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-error-boundary": "^4.0.11",
-    "swr": "^2.2.5",
-    "use-sync-external-store": "^1.2.2"
+    "react-error-boundary": "^4.0.11"
   },
   "devDependencies": {
     "@types/node": "^20.4.2",
