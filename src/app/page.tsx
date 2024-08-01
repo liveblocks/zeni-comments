@@ -35,7 +35,7 @@ interface SidebarProps
   description: ReactNode;
 }
 
-const customerIds = Array.from({ length: 500 }, (_, index) => `${index}`);
+const customerIds = Array.from({ length: 20 }, (_, index) => `${index}`);
 
 export default function Page() {
   const [focusedCustomerId, setFocusedCustomerId] = useState<string | null>(
