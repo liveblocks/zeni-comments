@@ -11,11 +11,11 @@ import {
   ClientSideSuspense,
   RoomProvider,
   useThreads,
+  useUserThreads_experimental,
 } from "@liveblocks/react";
 import { ThreadData } from "@liveblocks/core";
 import { Composer, Thread } from "@liveblocks/react-ui";
 import * as Dialog from "@radix-ui/react-dialog";
-import { experimental_useUserThreads } from "@liveblocks/react";
 import { Loading } from "../components/Loading";
 import { CollapsedThread } from "../components/CollapsedThread";
 
@@ -42,7 +42,7 @@ export default function Page() {
     null
   );
   const { threads, isLoading: isLoadingAllThreads } =
-    experimental_useUserThreads();
+    useUserThreads_experimental();
 
   return (
     <>
