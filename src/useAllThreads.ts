@@ -1,5 +1,12 @@
 import { ThreadData } from "@liveblocks/client";
-import useSWR from "swr";
+import { useClient } from "@liveblocks/react";
+import { useCallback, useEffect } from "react";
+import {
+  kInternal,
+  applyOptimisticUpdates,
+  CacheState,
+} from "@liveblocks/core";
+import { useSyncExternalStoreWithSelector } from "use-sync-external-store/shim/with-selector.js";
 
 type ThreadsStateLoading = {
   threads?: never;
@@ -24,27 +31,37 @@ type ThreadsState =
   | ThreadsStateError
   | ThreadsStateSuccess;
 
-const seconds = (seconds: number) => seconds * 1000;
-const minutes = (minutes: number) => seconds(minutes * 60);
-
 export function useAllThreads(): ThreadsState {
-  const fetcher = async (url: string) => {
-    const res = await fetch(url);
+  const client = useClient();
+  const store = client[kInternal].cacheStore;
 
-    return res.json();
-  };
+  useEffect(() => {
+    // TODO: Polling and inbox notifications
+    (client as any).getThreads().then(({ threads }: any) => {
+      store.updateThreadsAndNotifications(threads, [], [], []);
+    });
+  }, [store]);
 
-  const { data, isLoading, error } = useSWR<{ threads: ThreadData[] }, Error>(
-    "/api/liveblocks-user-threads",
-    fetcher,
-    {
-      refreshInterval: seconds(5),
-    }
+  const selector = useCallback(
+    (state: CacheState<any>): ThreadsStateSuccess => {
+      const result = applyOptimisticUpdates(state);
+
+      // TODO: filter deleted
+      return {
+        threads: Object.values(result.threads).sort(
+          (a, b) => a.createdAt.getTime() - b.createdAt.getTime()
+        ),
+        // TODO: Loading and error handling
+        isLoading: false,
+      };
+    },
+    []
   );
 
-  return {
-    threads: data?.threads,
-    isLoading,
-    error,
-  } as ThreadsState;
+  return useSyncExternalStoreWithSelector(
+    store.subscribe,
+    store.get,
+    store.get,
+    selector
+  );
 }
